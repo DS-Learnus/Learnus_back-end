@@ -5,6 +5,9 @@ const beerSchema = mongoose.Schema({
   name: {
     type: String,
   },
+  company: {
+    type: String,
+  },
   abv: {
     type: Number,
   },
