@@ -18,6 +18,9 @@ const recipeSchema = mongoose.Schema({
   avgScore: {
     type: Number,
   },
+  likes: {
+    type: Number,
+  },
 });
 
 const Recipe = mongoose.model("Recipe", recipeSchema);

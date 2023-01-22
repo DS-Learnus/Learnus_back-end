@@ -25,6 +25,9 @@ const beerSchema = mongoose.Schema({
   avgScore: {
     type: Number,
   },
+  likes: {
+    type: Number,
+  },
 });
 
 const Beer = mongoose.model("Beer", beerSchema);
