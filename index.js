@@ -23,6 +23,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!~~ from.root");
 });
 
+app.use("/api/user", require("./routes/user"));
+app.use("/api/beer", require("./routes/beer"));
+app.use("/api/recipe", require("./routes/recipe"));
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
