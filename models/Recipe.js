@@ -6,6 +6,12 @@ const recipeSchema = mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Beer",
   },
+  ingredient: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Ingredient",
+    },
+  ],
   content: {
     type: String,
   },
