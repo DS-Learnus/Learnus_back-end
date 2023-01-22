@@ -20,7 +20,7 @@ router.post("/login", (req, res) => {
     if (!user) {
       return res.json({
         loginSuccess: false,
-        message: "제공된 이메일에 해당하는 유저가 없습니다.",
+        message: "메일에 해당하는 유저가 없습니다.",
       });
     }
     user.comparePassword(req.body.password, (err, isMatch) => {
