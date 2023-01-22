@@ -12,6 +12,6 @@ const beerLikeSchema = mongoose.Schema({
   },
 });
 
-const BeerLikeSchema = mongoose.model("BeerLikeSchema", beerLikeSchema);
+const BeerLike = mongoose.model("BeerLikeSchema", beerLikeSchema);
 
-module.exports = { BeerLikeSchema };
+module.exports = { BeerLike };

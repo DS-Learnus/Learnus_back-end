@@ -14,6 +14,6 @@ const beerReviewSchema = mongoose.Schema({
   },
 });
 
-const BeerReviewSchema = mongoose.model("BeerReviewSchema", beerReviewSchema);
+const BeerReview = mongoose.model("BeerReviewSchema", beerReviewSchema);
 
-module.exports = { BeerReviewSchema };
+module.exports = { BeerReview };

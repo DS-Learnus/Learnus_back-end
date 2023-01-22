@@ -29,3 +29,5 @@ router.post("/postBeer", (req, res) => {
 // 주류 추천 기능 - get
 
 // 주류, 주류 레시피 검색 기능 - get
+
+module.exports = router;
