@@ -1,11 +1,39 @@
 const express = require("express");
 const router = express.Router();
+const { User } = require("../models/User");
 
 // 회원가입 - post
+router.post("/register", (req, res) => {
+  const user = new User(req.body);
+  user.save((err, userInfo) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).json({
+      success: true,
+      userInfo,
+    });
+  });
+});
 
 // 로그인 - post
+router.post("/login", (req, res) => {
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (!user) {
+      return res.json({
+        loginSuccess: false,
+        message: "제공된 이메일에 해당하는 유저가 없습니다.",
+      });
+    }
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (!isMatch)
+        return res.json({
+          loginSuccess: false,
+          message: "비밀번호가 틀렸습니다.",
+        });
 
-// 로그아웃 - get
+      res.status(200).json({ loginSuccess: true, user });
+    });
+  });
+});
 
 // 주류 좋아요 기능 - post
 

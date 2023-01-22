@@ -61,17 +61,16 @@ router.get("/:beerId", async (req, res) => {
 });
 
 // 주류 추천 기능 - get
-router.get("/recommend:userId", async (req, res) => {
+router.get("/recommend/:userId", async (req, res) => {
   try {
     // userId에 해당하는 user 찾기
     const userId = mongoose.Types.ObjectId(req.params.userId);
     const user = await User.findOne({ _id: userId });
 
-    console.log(user);
-
     //사용자에게 주량 얻기(단계)
-    const level = user[0].user; // 단계
-    const abv = level * 4; // 도수는 4배수로 하는게 어떨까?
+    const level = user.userAbv; // 단계
+    const abv = level * 5; // 도수는 단계*5배로 하는게 어떨까?
+    console.log(abv);
 
     //도수가 abv보다 낮은 맥주 목록 불러오기
     const recommendList = await Beer.find({ abv: { $lte: abv } });
