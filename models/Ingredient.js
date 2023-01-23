@@ -6,6 +6,9 @@ const ingredientSchema = mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Recipe",
   },
+  name: {
+    type: String,
+  },
   amount: {
     // 양
     type: Number,
