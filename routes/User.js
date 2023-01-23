@@ -1,6 +1,11 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const { Beer } = require("../models/Beer");
 const router = express.Router();
 const { User } = require("../models/User");
+const { BeerLike } = require("../models/BeerLike");
+const { Recipe } = require("../models/Recipe");
+const { RecipeLike } = require("../models/RecipeLike");
 
 // 회원가입 - post
 router.post("/register", (req, res) => {
@@ -35,14 +40,151 @@ router.post("/login", (req, res) => {
   });
 });
 
+// 사용자 정보 불러오기
+router.get("/mypage/:userId", async (req, res) => {
+  const userId = mongoose.Types.ObjectId(req.params.userId);
+  console.log(userId);
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Success to load User info!", user });
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ success: true, message: "False to load User Info!", err });
+  }
+});
+
 // 주류 좋아요 기능 - post
+router.post("/likeBeer", async (req, res) => {
+  // beerId, UserId 받기
+  try {
+    const beerId = req.body.beerId;
+    const userId = req.body.userId;
+
+    // 1. Beer에 likes +1
+    Beer.updateOne({ _id: beerId }, { $inc: { likes: 1 } }, (err, beerInfo) => {
+      if (err)
+        return res
+          .status(400)
+          .json({ success: false, message: "False to update to like." });
+    });
+
+    // 2. userId 넣어서 BeerLike 생성
+    console.log("생성1");
+    const newBeerLike = new BeerLike({ beerId: beerId, userId: userId });
+    newBeerLike.save((err, likeInfo) => {
+      if (err)
+        return res
+          .status(400)
+          .json({ success: false, message: "False to make a like." });
+
+      // 3. BeerLike의 id를 User의 likeBeers에 넣기
+      const beerLikeId = likeInfo._id;
+      console.log("생성2:" + beerLikeId);
+      User.updateOne(
+        { _id: userId },
+        { $push: { likeBeers: beerLikeId } },
+        (err, userInfo) => {
+          if (err)
+            return res
+              .status(400)
+              .json({ success: false, message: "False to update user like" });
+
+          return res.status(200).json({
+            success: false,
+            message: "Success to update user like.",
+            userInfo,
+          });
+        }
+      );
+
+      // return res.status(200).json({
+      //   success: true,
+      //   message: "Success to make a like.",
+      //   likeInfo,
+      // });
+    });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(400)
+      .json({ success: false, message: "Error code!", err });
+  }
+});
 
 // 주류 레시피 좋아요 기능 - post
+router.post("/likeRecipe", async (req, res) => {
+  // recipeId, UserId 받기
+  try {
+    const recipeId = req.body.recipeId;
+    const userId = req.body.userId;
 
+    // 1. Recipe에 likes +1
+    Recipe.updateOne(
+      { _id: recipeId },
+      { $inc: { likes: 1 } },
+      (err, recipeInfo) => {
+        if (err)
+          return res
+            .status(400)
+            .json({ success: false, message: "False to update to like." });
+      }
+    );
+
+    // 2. userId 넣어서 RecipeLike 생성
+    console.log("생성1");
+    const newRecipeLike = new RecipeLike({
+      recipeId: recipeId,
+      userId: userId,
+    });
+    newRecipeLike.save((err, likeInfo) => {
+      if (err)
+        return res
+          .status(400)
+          .json({ success: false, message: "False to make a like." });
+
+      // 3. BeerLike의 id를 User의 likeBeers에 넣기
+      const recipeLikeId = likeInfo._id;
+      console.log("생성2:" + recipeLikeId);
+      User.updateOne(
+        { _id: userId },
+        { $push: { likeRecipes: recipeLikeId } },
+        (err, userInfo) => {
+          if (err)
+            return res
+              .status(400)
+              .json({ success: false, message: "False to update user like" });
+
+          return res.status(200).json({
+            success: false,
+            message: "Success to update user like.",
+            userInfo,
+          });
+        }
+      );
+
+      // return res.status(200).json({
+      //   success: true,
+      //   message: "Success to make a like.",
+      //   likeInfo,
+      // });
+    });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(400)
+      .json({ success: false, message: "Error code!", err });
+  }
+});
+
+// 다같이해..
 // 사용자가 선호하는 주류 목록 - get
 
 // 사용자가 선호하는 주류 레시피 목록 - get
 
-// 사용자가 작성한 주류 레시피 목록 - get
+// ++ 사용자가 작성한 주류 레시피 목록 - get
 
 module.exports = router;
