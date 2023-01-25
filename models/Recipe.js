@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 const recipeSchema = mongoose.Schema(
   {
+    name: {
+      type: String,
+    },
     beerId: {
       type: Schema.Types.ObjectId,
       ref: "Beer",
