@@ -46,60 +46,85 @@ router.get("/mypage/:userId", async (req, res) => {
   //console.log(userId);
   try {
     // 사용자 정보
-    //console.log("실행1");
-    const user = await User.findOne({ _id: userId })
-      .populate({
-        path: "likeRecipes",
-        model: "RecipeLike",
-      })
-      .populate({ path: "likeBeers", model: "BeerLike" });
+    console.log("실행1");
+    User.findOne({ _id: userId }, { _id: -1 }, async (err, userInfo) => {
+      const myLikeBeers = await Beer.find().or([
+        { beerId: userInfo.likeBeers[0] },
+        { beerId: userInfo.likeBeers[1] },
+        { beerId: userInfo.likeBeers[2] },
+      ]);
 
+      const myLikeRecipes = await Recipe.find().or([
+        { recipeId: userInfo.likeRecipes[0] },
+        { recipeId: userInfo.likeRecipes[1] },
+        { recipeId: userInfo.likeRecipes[2] },
+      ]);
+
+      if (err)
+        res
+          .status(400)
+          .json({ success: false, message: "False to load a like data", err });
+
+      return res.status(200).json({
+        success: true,
+        message: "Success to load User info!",
+        myLikeBeers,
+        myLikeRecipes,
+      });
+    })
+      .populate({
+        path: "likeRecipes.recipeId",
+        model: "RecipeLike",
+        select: "likeRecipes",
+      })
+      .populate({
+        path: "likeBeers.beerId",
+        model: "BeerLike",
+        select: "likeBeers",
+      });
     // 배열에 좋아요한 주류, 주류 레시피 각각 넣기
     //console.log("실행2");
-    let beerId;
-    let recipeId;
-    const userlikeBeers = new Array(0);
-    const userlikeRecipes = new Array(0);
-    console.log(user.likeBeers.length);
+    // let beerId;
+    // let recipeId;
+    // let userlikeBeers = new Array(0);
+    // let userlikeRecipes = new Array(0);
+    // console.log(user.likeBeers.length);
+    // console.log("실행1");
 
-    for (i = 0; i < user.likeBeers.length; i++) {
-      BeerLike.findOne({ _id: user.likeBeers[i]._id }, (err, beers) => {
-        beerId = beers.beerId;
-        console.log("beerId " + beerId);
+    // for (i = 0; i < user.likeBeers.length; i++) {
+    //   console.log("실행2");
+    //   BeerLike.findOne({ _id: user.likeBeers[i]._id }, async (err, beers) => {
+    //     beerId = beers.beerId;
+    //     console.log("beerId " + beerId);
 
-        Beer.findOne({ _id: beerId }, (err, beers) => {
-          userlikeBeers.push(beers);
-          console.log(userlikeBeers);
-        });
-      });
-    }
-    for (i = 0; i < user.likeRecipes.length; i++) {
-      RecipeLike.findOne({ _id: user.likeRecipes[i]._id }, (err, recipes) => {
-        recipeId = recipes.recipeId;
-        console.log("recipeId " + recipeId);
+    //     Beer.findOne({ _id: beerId }, (err, beers) => {
+    //       userlikeBeers.push(beers);
+    //       //console.log(userlikeBeers);
+    //     });
+    //   });
+    // }
+    // for (i = 0; i < user.likeRecipes.length; i++) {
+    //   console.log("실행3");
+    //   RecipeLike.findOne({ _id: user.likeRecipes[i]._id }, (err, recipes) => {
+    //     recipeId = recipes.recipeId;
+    //     //console.log("recipeId " + recipeId);
 
-        Recipe.findOne({ _id: recipeId }, (err, recipes) => {
-          userlikeRecipes.push(recipes);
-          console.log(userlikeRecipes);
+    //     Recipe.findOne({ _id: recipeId }, (err, recipes) => {
+    //       userlikeRecipes.push(recipes);
+    //       // console.log(userlikeRecipes);
 
-          if (err)
-            return res
-              .status(400)
-              .json({ success: true, message: "False to load user data!" });
-        });
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: "Success to load User info!",
-      user,
-      userlikeBeers,
-      userlikeRecipes,
-    });
+    //       if (err)
+    //         return res
+    //           .status(400)
+    //           .json({ success: true, message: "False to load user data!" });
+    //     });
+    //   });
+    // }
+    // console.log("실행4");
   } catch (err) {
     return res
       .status(400)
-      .json({ success: true, message: "False to load User Info!", err });
+      .json({ success: false, message: "False to load User Info!", err });
   }
 });
 
