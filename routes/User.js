@@ -48,7 +48,7 @@ router.get("/mypage/:userId", async (req, res) => {
     // 사용자 정보
     console.log("실행1");
     User.findOne({ _id: userId }, { _id: -1 }, async (err, userInfo) => {
-      const myLikeBeers = await Beer.find().or([
+      const myLikeBeers = await Beer.find({}, { name: 1 }).or([
         { beerId: userInfo.likeBeers[0] },
         { beerId: userInfo.likeBeers[1] },
         { beerId: userInfo.likeBeers[2] },
