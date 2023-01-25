@@ -151,4 +151,6 @@ router.post("/addRecipe", async (req, res) => {
   }
 });
 
+// 레시피에 평점과 후기 달기
+
 module.exports = router;

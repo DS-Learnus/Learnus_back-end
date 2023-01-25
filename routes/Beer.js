@@ -4,6 +4,7 @@ const router = express.Router();
 const { Beer } = require("../models/Beer");
 const { User } = require("../models/User");
 const { Recipe } = require("../models/Recipe");
+const { BeerReview } = require("../models/BeerReview");
 
 // (admin) 주류 추가 - post
 router.post("/postBeer", (req, res) => {
@@ -91,8 +92,33 @@ router.get("/recommend/:userId", async (req, res) => {
       err,
     });
   }
+}); // + 해당 주류를 사용한 레시피도 추천해준다.
+
+// post 주류에 평점과 후기 달기
+router.post("/addReview", async (req, res) => {
+  const beerId = req.body.beerId;
+
+  try {
+    const newBeerReview = new BeerReview(req.body);
+    // 리뷰 저장하기
+    newBeerReview.save(async (err, review) => {
+      if (err)
+        return res
+          .status(400)
+          .json({ success: false, message: "False to add review." });
+      console.log("실행0");
+      // Beer에 review 추가하기
+      await Beer.updateOne({ _id: beerId }, { $push: { review: review._id } });
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Success to add a review in Beer array.",
+    });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: "Error code." });
+  }
 });
 
-// 주류, 주류 레시피 검색 기능 - get
+// 주류, 주류 레시피 검색 기능 - get, params 사용 (빼면 안될까요?)
 
 module.exports = router;

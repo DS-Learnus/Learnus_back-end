@@ -43,13 +43,59 @@ router.post("/login", (req, res) => {
 // 사용자 정보 불러오기
 router.get("/mypage/:userId", async (req, res) => {
   const userId = mongoose.Types.ObjectId(req.params.userId);
-  console.log(userId);
+  //console.log(userId);
   try {
-    const user = await User.findOne({ _id: userId });
+    // 사용자 정보
+    //console.log("실행1");
+    const user = await User.findOne({ _id: userId })
+      .populate({
+        path: "likeRecipes",
+        model: "RecipeLike",
+      })
+      .populate({ path: "likeBeers", model: "BeerLike" });
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Success to load User info!", user });
+    // 배열에 좋아요한 주류, 주류 레시피 각각 넣기
+    //console.log("실행2");
+    let beerId;
+    let recipeId;
+    const userlikeBeers = new Array(0);
+    const userlikeRecipes = new Array(0);
+    console.log(user.likeBeers.length);
+
+    for (i = 0; i < user.likeBeers.length; i++) {
+      BeerLike.findOne({ _id: user.likeBeers[i]._id }, (err, beers) => {
+        beerId = beers.beerId;
+        console.log("beerId " + beerId);
+
+        Beer.findOne({ _id: beerId }, (err, beers) => {
+          userlikeBeers.push(beers);
+          console.log(userlikeBeers);
+        });
+      });
+    }
+    for (i = 0; i < user.likeRecipes.length; i++) {
+      RecipeLike.findOne({ _id: user.likeRecipes[i]._id }, (err, recipes) => {
+        recipeId = recipes.recipeId;
+        console.log("recipeId " + recipeId);
+
+        Recipe.findOne({ _id: recipeId }, (err, recipes) => {
+          userlikeRecipes.push(recipes);
+          console.log(userlikeRecipes);
+
+          if (err)
+            return res
+              .status(400)
+              .json({ success: true, message: "False to load user data!" });
+        });
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Success to load User info!",
+      user,
+      userlikeBeers,
+      userlikeRecipes,
+    });
   } catch (err) {
     return res
       .status(400)
@@ -94,7 +140,7 @@ router.post("/likeBeer", async (req, res) => {
               .json({ success: false, message: "False to update user like" });
 
           return res.status(200).json({
-            success: false,
+            success: true,
             message: "Success to update user like.",
             userInfo,
           });
@@ -159,7 +205,7 @@ router.post("/likeRecipe", async (req, res) => {
               .json({ success: false, message: "False to update user like" });
 
           return res.status(200).json({
-            success: false,
+            success: true,
             message: "Success to update user like.",
             userInfo,
           });
@@ -179,11 +225,6 @@ router.post("/likeRecipe", async (req, res) => {
       .json({ success: false, message: "Error code!", err });
   }
 });
-
-// 다같이해..
-// 사용자가 선호하는 주류 목록 - get
-
-// 사용자가 선호하는 주류 레시피 목록 - get
 
 // ++ 사용자가 작성한 주류 레시피 목록 - get
 

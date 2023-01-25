@@ -28,6 +28,12 @@ const beerSchema = mongoose.Schema({
   likes: {
     type: Number,
   },
+  review: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "BeerReview",
+    },
+  ],
 });
 
 const Beer = mongoose.model("Beer", beerSchema);
