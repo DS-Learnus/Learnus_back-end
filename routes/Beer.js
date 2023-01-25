@@ -78,14 +78,31 @@ router.get("/recommend/:userId", async (req, res) => {
     const recommendList = await Beer.find({ abv: { $lte: abv } });
     // random
     const random = Math.floor(Math.random() * recommendList.length);
-    console.log(recommendList);
-    console.log(random);
+    //console.log(recommendList);
+    //console.log(random);
     const result = recommendList[random];
-    console.log(result);
+    //console.log(result);
 
-    res
-      .status(200)
-      .json({ success: true, message: "Recommend Finish!", result });
+    let resultRecipe = null;
+    const recommendRecipe = await Recipe.find({ beerId: result._id });
+    console.log(recommendRecipe);
+    if (recommendRecipe.length != 0) {
+      const random = Math.floor(Math.random() * recommendRecipe.length);
+      resultRecipe = recommendRecipe[random];
+
+      return res.status(200).json({
+        success: true,
+        message: "Recommend Finish!, recommend recipe not null.",
+        result,
+        resultRecipe,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Recommend Finish!, recommend recipe null.",
+      result,
+      resultRecipe,
+    });
   } catch (err) {
     return res.status(400).json({
       sccess: false,
@@ -93,7 +110,7 @@ router.get("/recommend/:userId", async (req, res) => {
       err,
     });
   }
-}); // + 해당 주류를 사용한 레시피도 추천해준다.
+});
 
 // 주류에 평점과 후기 달기 - post
 router.post("/addReview", async (req, res) => {
