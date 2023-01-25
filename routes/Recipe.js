@@ -52,7 +52,9 @@ router.get("/:recipeId", async (req, res) => {
   const recipeId = mongoose.Types.ObjectId(req.params.recipeId);
 
   Recipe.findOne({ _id: recipeId })
-    .populate("ingredient")
+    .populate({ path: "ingredient", model: "Ingredient" })
+    .populate({ path: "review", model: "RecipeReview" })
+    .populate({ path: "userId", model: "User", select: { nikname: 1 } })
     .then(async (recipeDetail) => {
       return res
         .status(200)
