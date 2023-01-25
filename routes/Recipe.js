@@ -76,6 +76,7 @@ router.post("/addRecipe", async (req, res) => {
     const beerId = req.body.beerId;
     const userId = req.body.userId;
     const content = req.body.content;
+    const name = req.body.name;
     const ingredient = req.body.ingredient; // array
     console.log(ingredient.length);
     console.log("실행0");
@@ -83,6 +84,7 @@ router.post("/addRecipe", async (req, res) => {
     // 1. 레시피 등록
     let recipeId;
     const newRecipe = new Recipe({
+      name: name,
       beerId: beerId,
       userId: userId,
       content: content,
