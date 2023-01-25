@@ -94,7 +94,7 @@ router.get("/recommend/:userId", async (req, res) => {
   }
 }); // + 해당 주류를 사용한 레시피도 추천해준다.
 
-// post 주류에 평점과 후기 달기
+// 주류에 평점과 후기 달기 - post
 router.post("/addReview", async (req, res) => {
   const beerId = req.body.beerId;
 

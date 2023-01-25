@@ -26,6 +26,12 @@ const recipeSchema = mongoose.Schema(
     likes: {
       type: Number,
     },
+    review: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "BeerReview",
+      },
+    ],
   },
   { timestamps: true }
 );

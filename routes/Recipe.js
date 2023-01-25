@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const { Recipe } = require("../models/Recipe");
 const { Ingredient } = require("../models/Ingredient");
+const { RecipeReview } = require("../models/RecipeReview");
 
 // (admin) 레시피 추가 - post
 router.post("/postRecipe", (req, res) => {
@@ -151,6 +152,32 @@ router.post("/addRecipe", async (req, res) => {
   }
 });
 
-// 레시피에 평점과 후기 달기
+// 레시피에 평점과 후기 달기 - post
+router.post("/addReview", async (req, res) => {
+  const recipeId = req.body.recipeId;
+
+  try {
+    const newRecipeReview = new RecipeReview(req.body);
+    // 리뷰 저장하기
+    newRecipeReview.save(async (err, review) => {
+      if (err)
+        return res
+          .status(400)
+          .json({ success: false, message: "False to add review." });
+      console.log("실행0");
+      // Beer에 review 추가하기
+      await Recipe.updateOne(
+        { _id: recipeId },
+        { $push: { review: review._id } }
+      );
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Success to add a review in Recipe array.",
+    });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: "Error code." });
+  }
+});
 
 module.exports = router;
