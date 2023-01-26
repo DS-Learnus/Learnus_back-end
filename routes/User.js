@@ -45,42 +45,50 @@ router.get("/mypage/:userId", async (req, res) => {
   const userId = mongoose.Types.ObjectId(req.params.userId);
   //console.log(userId);
   try {
-    // 사용자 정보
-    console.log("실행1");
-    User.findOne({ _id: userId }, { _id: -1 }, async (err, userInfo) => {
-      const myLikeBeers = await Beer.find({}, { name: 1 }).or([
-        { beerId: userInfo.likeBeers[0] },
-        { beerId: userInfo.likeBeers[1] },
-        { beerId: userInfo.likeBeers[2] },
-      ]);
-
-      const myLikeRecipes = await Recipe.find().or([
-        { recipeId: userInfo.likeRecipes[0] },
-        { recipeId: userInfo.likeRecipes[1] },
-        { recipeId: userInfo.likeRecipes[2] },
-      ]);
-
-      if (err)
-        res
-          .status(400)
-          .json({ success: false, message: "False to load a like data", err });
-
-      return res.status(200).json({
-        success: true,
-        message: "Success to load User info!",
-        myLikeBeers,
-        myLikeRecipes,
-      });
-    })
+    //   // 사용자 정보
+    User.findOne(
+      { _id: userId },
+      // { "likeBeers.beerId": 1, "likeRecipe.recipeId": 1 },
+      async (err, userInfo) => {
+        console.log(userInfo);
+        //       const myLikeBeers = await Beer.find({
+        //         beerId: { $in: "userInfo.likeBeers.beerId" },
+        //       });
+        //       console.log(myLikeBeers);
+        //       const myLikeRecipes = await Recipe.find();
+        if (err)
+          res.status(400).json({
+            success: false,
+            message: "False to load a like data",
+            err,
+          });
+        return res.status(200).json({
+          success: true,
+          message: "Success to load User info!",
+          nikname: userInfo.nikname,
+          email: userInfo.email,
+          mylikeBeerCount: userInfo.likeBeers.length,
+          myLikeRecipeCount: userInfo.likeRecipes.count,
+          mylikeBeer: userInfo.likeBeers,
+          myLikeRecipe: userInfo.likeRecipes,
+        });
+      }
+    )
       .populate({
-        path: "likeRecipes.recipeId",
+        path: "likeRecipes",
         model: "RecipeLike",
-        select: "likeRecipes",
+        populate: {
+          path: "recipeId",
+          model: "Recipe",
+        },
       })
       .populate({
-        path: "likeBeers.beerId",
+        path: "likeBeers",
         model: "BeerLike",
-        select: "likeBeers",
+        populate: {
+          path: "beerId",
+          model: "Beer",
+        },
       });
     // 배열에 좋아요한 주류, 주류 레시피 각각 넣기
     //console.log("실행2");
@@ -90,13 +98,11 @@ router.get("/mypage/:userId", async (req, res) => {
     // let userlikeRecipes = new Array(0);
     // console.log(user.likeBeers.length);
     // console.log("실행1");
-
     // for (i = 0; i < user.likeBeers.length; i++) {
     //   console.log("실행2");
     //   BeerLike.findOne({ _id: user.likeBeers[i]._id }, async (err, beers) => {
     //     beerId = beers.beerId;
     //     console.log("beerId " + beerId);
-
     //     Beer.findOne({ _id: beerId }, (err, beers) => {
     //       userlikeBeers.push(beers);
     //       //console.log(userlikeBeers);
@@ -108,11 +114,9 @@ router.get("/mypage/:userId", async (req, res) => {
     //   RecipeLike.findOne({ _id: user.likeRecipes[i]._id }, (err, recipes) => {
     //     recipeId = recipes.recipeId;
     //     //console.log("recipeId " + recipeId);
-
     //     Recipe.findOne({ _id: recipeId }, (err, recipes) => {
     //       userlikeRecipes.push(recipes);
     //       // console.log(userlikeRecipes);
-
     //       if (err)
     //         return res
     //           .status(400)
