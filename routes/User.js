@@ -67,8 +67,9 @@ router.get("/mypage/:userId", async (req, res) => {
           message: "Success to load User info!",
           nikname: userInfo.nikname,
           email: userInfo.email,
+          abv: userInfo.userAbv,
           mylikeBeerCount: userInfo.likeBeers.length,
-          myLikeRecipeCount: userInfo.likeRecipes.count,
+          myLikeRecipeCount: userInfo.likeRecipes.length,
           mylikeBeer: userInfo.likeBeers,
           myLikeRecipe: userInfo.likeRecipes,
         });

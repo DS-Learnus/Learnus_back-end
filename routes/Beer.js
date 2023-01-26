@@ -62,6 +62,31 @@ router.get("/:beerId", async (req, res) => {
     });
 });
 
+function getFormatDate() {}
+
+function currnetDate() {
+  // 현재 날짜를 한국시간으로 계산.
+  // UTC 시간 계산
+  curr = new Date();
+  const utc = curr.getTime() + curr.getTimezoneOffset() * 60 * 1000;
+  console.log("실행0-1");
+  // UTC to KST (UTC + 9시간)
+  const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+  const date = new Date(utc + KR_TIME_DIFF);
+  console.log("실행0-2");
+  // const year = date.getFullYear();
+  // const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  // const day = ("0" + date.getDate()).slice(-2);
+  // const dateStr = year + "-" + month + "-" + day;
+
+  console.log(date);
+  return date;
+}
+
+// 추천 기능에서 사용될 변수
+var recordData = new Date("2000-01-01"); // 사용자가 추천받았던 Date 객체 기록
+var recordRandom = 1;
+
 // 주류 추천 기능 - get
 router.get("/recommend/:userId", async (req, res) => {
   try {
@@ -72,16 +97,39 @@ router.get("/recommend/:userId", async (req, res) => {
     //사용자에게 주량 얻기(단계)
     const level = user.userAbv; // 단계
     const abv = level * 5; // 도수는 단계*5배로 하는게 어떨까?
-    console.log(abv);
 
     //도수가 abv보다 낮은 맥주 목록 불러오기
     const recommendList = await Beer.find({ abv: { $lte: abv } });
-    // random
-    const random = Math.floor(Math.random() * recommendList.length);
+
+    // current, random
+    console.log("실행0");
+    let current = currnetDate();
+    console.log("실행1");
+
+    if (
+      // 날짜가 같으면
+      current.getFullYear() === recordData.getFullYear() &&
+      current.getMonth() === recordData.getMonth() &&
+      current.getDate() === recordData.getDate()
+    ) {
+      // 같은 대로 냅두기
+      console.log("실행2");
+    } else {
+      // 날짜가 같지 않으면
+      recordRandom = Math.floor(Math.random() * recommendList.length);
+      console.log("실행3");
+    }
+    console.log(recordRandom);
+    console.log("실행4");
+
+    // 날짜 초기화
+    recordData = current;
+
     //console.log(recommendList);
     //console.log(random);
-    const result = recommendList[random];
+    const result = recommendList[recordRandom];
     //console.log(result);
+    console.log(recommendList[recordRandom]);
 
     let resultRecipe = null;
     const recommendRecipe = await Recipe.find({ beerId: result._id });
