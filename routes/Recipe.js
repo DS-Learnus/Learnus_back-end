@@ -22,11 +22,11 @@ router.get("/recipeList", async (req, res) => {
   try {
     const page = Number(req.query.page || 1); // default page
     const perPage = 8;
-    const sort = Number(req.query.sort || 1); // 1: 이름순, 2: 인기순
+    const sort = Number(req.query.sort || 1);
     const recipes = await Recipe.find({}, { name: 1, review: 1, image: 1 })
       .populate({ path: "review", model: "RecipeReview" })
       .populate({ path: "userId", model: "User", select: "nikname" })
-      .sort(sort == 1 ? { name: 1 } : { likes: -1 }) //-1: desc, 1: asc
+      .sort(sort == 1 ? { name: 1 } : { likes: -1 })
       .skip(perPage * (page - 1)) // 검색 시 포함되지 않을 데이터 수
       .limit(perPage);
 
@@ -76,16 +76,14 @@ router.get("/:recipeId", async (req, res) => {
 });
 
 // **레시피 등록 - post
-// 프론트에서 재료(이름, 양, 단위) 개당 배열에 넣어서 보내달라고 하기
 router.post("/addRecipe", async (req, res) => {
   try {
     const beerId = req.body.beerId;
     const userId = req.body.userId;
     const content = req.body.content;
     const name = req.body.name;
-    const ingredient = req.body.ingredient; // array
+    const ingredient = req.body.ingredient;
     console.log(ingredient.length);
-    console.log("실행0");
 
     // 1. 레시피 등록
     let recipeId;
@@ -95,23 +93,22 @@ router.post("/addRecipe", async (req, res) => {
       userId: userId,
       content: content,
     });
-    console.log("실행1");
+
     await newRecipe.save(async (err, recipeInfo) => {
       if (err) return res.status(400).json({ success: false, err });
-      console.log("실행2");
+
       recipeId = recipeInfo._id; // recipe id 얻기
 
       // 2. Ingredient 등록
       for (i = 0; i < ingredient.length; i++) {
         // 2-1 객체 생성
-        console.log("실행3");
+
         const newIngredient = new Ingredient({
           recipeId: recipeId,
           name: ingredient[i][0],
           amount: ingredient[i][1],
           unit: ingredient[i][2],
         });
-        console.log("실행4");
 
         // 2-2 save
         await newIngredient
@@ -127,7 +124,7 @@ router.post("/addRecipe", async (req, res) => {
       }
 
       // 3. 등록했던 Ingredient 찾고 각각의 _id 얻기
-      console.log("실행5");
+
       const findIngre = await Ingredient.find({ recipeId: recipeId });
       let arrayIngreId = new Array(0);
 
@@ -174,7 +171,7 @@ router.post("/addReview", async (req, res) => {
         return res
           .status(400)
           .json({ success: false, message: "False to add review." });
-      console.log("실행0");
+
       // Beer에 review 추가하기
       await Recipe.updateOne(
         { _id: recipeId },

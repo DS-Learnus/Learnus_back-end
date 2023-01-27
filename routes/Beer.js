@@ -17,7 +17,7 @@ router.get("/beerList", async (req, res) => {
   try {
     const page = Number(req.query.page || 1); // default page
     const perPage = 8;
-    const sort = Number(req.query.sort || 1); // 1: 이름순, 2: 인기순
+    const sort = Number(req.query.sort || 1);
     const beers = await Beer.find({})
       .sort(sort == 1 ? { name: 1 } : { likes: -1 }) //-1: desc, 1: asc
       .skip(perPage * (page - 1)) // 검색 시 포함되지 않을 데이터 수
@@ -66,8 +66,6 @@ router.get("/:beerId", async (req, res) => {
     });
 });
 
-function getFormatDate() {}
-
 function currnetDate() {
   // 현재 날짜를 한국시간으로 계산.
   // UTC 시간 계산
@@ -78,12 +76,7 @@ function currnetDate() {
   const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
   const date = new Date(utc + KR_TIME_DIFF);
   console.log("실행0-2");
-  // const year = date.getFullYear();
-  // const month = ("0" + (date.getMonth() + 1)).slice(-2);
-  // const day = ("0" + date.getDate()).slice(-2);
-  // const dateStr = year + "-" + month + "-" + day;
 
-  console.log(date);
   return date;
 }
 
@@ -100,15 +93,13 @@ router.get("/recommend/:userId", async (req, res) => {
 
     //사용자에게 주량 얻기(단계)
     const level = user.userAbv; // 단계
-    const abv = level * 5; // 도수는 단계*5배로 하는게 어떨까?
+    const abv = level * 5; // 도수는 단계 * 5배로 하는게 어떨까?
 
     //도수가 abv보다 낮은 맥주 목록 불러오기
     const recommendList = await Beer.find({ abv: { $lte: abv } });
 
     // current, random
-    console.log("실행0");
     let current = currnetDate();
-    console.log("실행1");
 
     if (
       // 날짜가 같으면
@@ -121,10 +112,7 @@ router.get("/recommend/:userId", async (req, res) => {
     } else {
       // 날짜가 같지 않으면
       recordRandom = Math.floor(Math.random() * recommendList.length);
-      console.log("실행3");
     }
-    console.log(recordRandom);
-    console.log("실행4");
 
     // 날짜 초기화
     recordData = current;
@@ -176,7 +164,6 @@ router.post("/addReview", async (req, res) => {
         return res
           .status(400)
           .json({ success: false, message: "False to add review." });
-      console.log("실행0");
       // Beer에 review 추가하기
       await Beer.updateOne({ _id: beerId }, { $push: { review: review._id } });
     });
@@ -188,7 +175,5 @@ router.post("/addReview", async (req, res) => {
     return res.status(400).json({ success: false, message: "Error code." });
   }
 });
-
-// 주류, 주류 레시피 검색 기능 - get, params 사용 (빼면 안될까요?)
 
 module.exports = router;
