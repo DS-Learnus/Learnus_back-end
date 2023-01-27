@@ -12,11 +12,11 @@ router.post("/postBeer", (req, res) => {
   res.status(200).json({ success: true, message: "Finish to insert data!" });
 });
 
-// 주류 목록 페이지네이션 6 or 9 - get
+// 주류 목록 페이지네이션 - get
 router.get("/beerList", async (req, res) => {
   try {
     const page = Number(req.query.page || 1); // default page
-    const perPage = 3;
+    const perPage = 8;
     const sort = Number(req.query.sort || 1); // 1: 이름순, 2: 인기순
     const beers = await Beer.find({})
       .sort(sort == 1 ? { name: 1 } : { likes: -1 }) //-1: desc, 1: asc

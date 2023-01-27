@@ -17,11 +17,11 @@ router.post("/postIngredient", (req, res) => {
   res.status(200).json({ success: true, message: "Finish to insert data!" });
 });
 
-// 레시피 목록 페이지네이션 6 or 9 - get
+// 레시피 목록 페이지네이션 - get
 router.get("/recipeList", async (req, res) => {
   try {
     const page = Number(req.query.page || 1); // default page
-    const perPage = 3;
+    const perPage = 8;
     const sort = Number(req.query.sort || 1); // 1: 이름순, 2: 인기순
     const recipes = await Recipe.find({}, { name: 1, review: 1 })
       .populate({ path: "review", model: "RecipeReview" })
