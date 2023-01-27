@@ -23,7 +23,7 @@ router.get("/recipeList", async (req, res) => {
     const page = Number(req.query.page || 1); // default page
     const perPage = 8;
     const sort = Number(req.query.sort || 1); // 1: 이름순, 2: 인기순
-    const recipes = await Recipe.find({}, { name: 1, review: 1 })
+    const recipes = await Recipe.find({}, { name: 1, review: 1, image: 1 })
       .populate({ path: "review", model: "RecipeReview" })
       .populate({ path: "userId", model: "User", select: "nikname" })
       .sort(sort == 1 ? { name: 1 } : { likes: -1 }) //-1: desc, 1: asc

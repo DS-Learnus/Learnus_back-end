@@ -43,7 +43,7 @@ router.post("/login", (req, res) => {
 // 사용자 정보 불러오기
 router.get("/mypage/:userId", async (req, res) => {
   const userId = mongoose.Types.ObjectId(req.params.userId);
-  //console.log(userId);
+  console.log(userId);
   try {
     //   // 사용자 정보
     User.findOne(
