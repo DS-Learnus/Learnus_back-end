@@ -257,9 +257,9 @@ router.post("/likeRecipe", async (req, res) => {
 });
 
 // 사용자가 해당 맥주의 like를 눌렀는지 확인
-router.post("/checkBeerLike", (req, res) => {
-  const beerId = req.body.beerId;
-  const userId = req.body.userId;
+router.get("/checkBeerLike/:beerId/:userId", (req, res) => {
+  const beerId = mongoose.Types.ObjectId(req.params.beerId);
+  const userId = mongoose.Types.ObjectId(req.params.userId);
 
   BeerLike.findOne({ beerId: beerId, userId: userId }, (err, like) => {
     if (err) return res.status(400).json({ success: false });
@@ -270,9 +270,9 @@ router.post("/checkBeerLike", (req, res) => {
 });
 
 // 사용자가 해당 레시피의 like를 눌렀는지 확인
-router.post("/checkRecipeLike", (req, res) => {
-  const recipeId = req.body.recipeId;
-  const userId = req.body.userId;
+router.get("/checkRecipeLike/:recipeId/:userId", (req, res) => {
+  const recipeId = mongoose.Types.ObjectId(req.params.recipeId);
+  const userId = mongoose.Types.ObjectId(req.params.userId);
 
   RecipeLike.findOne({ recipeId: recipeId, userId: userId }, (err, like) => {
     if (err) return res.status(400).json({ success: false });
