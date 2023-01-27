@@ -256,6 +256,32 @@ router.post("/likeRecipe", async (req, res) => {
   }
 });
 
+// 사용자가 해당 맥주의 like를 눌렀는지 확인
+router.post("/checkBeerLike", (req, res) => {
+  const beerId = req.body.beerId;
+  const userId = req.body.userId;
+
+  BeerLike.findOne({ beerId: beerId, userId: userId }, (err, like) => {
+    if (err) return res.status(400).json({ success: false });
+    if (like == null)
+      return res.status(200).json({ success: true, like: false });
+    else return res.status(200).json({ success: true, like: true });
+  });
+});
+
+// 사용자가 해당 레시피의 like를 눌렀는지 확인
+router.post("/checkRecipeLike", (req, res) => {
+  const recipeId = req.body.recipeId;
+  const userId = req.body.userId;
+
+  RecipeLike.findOne({ recipeId: recipeId, userId: userId }, (err, like) => {
+    if (err) return res.status(400).json({ success: false });
+    if (like == null)
+      return res.status(200).json({ success: true, like: false });
+    else return res.status(200).json({ success: true, like: true });
+  });
+});
+
 // ++ 사용자가 작성한 주류 레시피 목록 - get
 
 module.exports = router;
