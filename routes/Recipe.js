@@ -55,7 +55,11 @@ router.get("/:recipeId", async (req, res) => {
 
   Recipe.findOne({ _id: recipeId })
     .populate({ path: "ingredient", model: "Ingredient" })
-    .populate({ path: "review", model: "RecipeReview" })
+    .populate({
+      path: "review",
+      model: "RecipeReview",
+      populate: { path: "userId", model: "User", select: "nikname" },
+    })
     .populate({ path: "userId", model: "User", select: { nikname: 1 } })
     .then(async (recipeDetail) => {
       return res

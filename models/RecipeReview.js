@@ -7,6 +7,10 @@ const recipeSchema = mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Recipe",
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     score: {
       type: Number,
     },

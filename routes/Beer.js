@@ -47,7 +47,11 @@ router.get("/:beerId", async (req, res) => {
   const beerId = mongoose.Types.ObjectId(req.params.beerId);
 
   Beer.findOne({ _id: beerId })
-    .populate({ path: "review", model: "BeerReview" })
+    .populate({
+      path: "review",
+      model: "BeerReview",
+      populate: { path: "userId", model: "User", select: "nikname" },
+    })
     .then(async (beerDetail) => {
       return res
         .status(200)

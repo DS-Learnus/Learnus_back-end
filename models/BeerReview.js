@@ -7,6 +7,10 @@ const beerReviewSchema = mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Beer",
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     score: {
       type: Number,
     },
